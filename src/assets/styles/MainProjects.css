@@ -1,0 +1,11 @@
+.section__mainproject-list{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 40px;
+}
+
+.main_project-categories-list{
+    width: 100%;
+    white-space: nowrap;
+}

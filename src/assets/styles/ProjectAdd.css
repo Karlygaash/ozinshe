@@ -1,0 +1,216 @@
+.section .section__navigation{
+    display: flex;
+    align-items: center;
+}
+
+.section .section__navigation .last-page{
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    letter-spacing: -0.4px;
+    color: #8F92A1;
+}
+
+.section .section__navigation .current-page{
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.section .section__navigation img{
+    margin: 0 14px;
+}
+
+.section .add__container{
+    background-color: white;
+    border-radius: 15px;
+    padding: 32px;
+    margin-top: 40px;
+}
+
+.section .add__container .add__container-title{
+    display: flex;
+}
+
+.add__container-title h2{
+    font-size: 22px;
+    line-height: 30px;
+    letter-spacing: -0.4px;
+    font-weight: 700;
+    margin-left: 16px;
+}
+
+.add__container-form{
+    margin-top: 32px;
+}
+
+.input-box{
+    position: relative;
+    height: 46px;
+    line-height: 46px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.select-box{
+    position: relative;
+    height: 46px;
+    margin-bottom: 16px;
+    width: 100%;   
+}
+
+.add__container-form .textarea-box{
+    position: relative;
+    height: 190px;
+    margin-bottom: 16px;
+}
+
+.input-box .input{
+    font-size: 14px;
+    letter-spacing: -0.2px;
+    font-weight: 700;
+    outline: none;
+    position: absolute;
+    z-index: 111;
+    height: 46px;
+    line-height: 46px;
+    width: 100%;
+}
+
+.add__container-form .textarea-box .textarea{
+    font-size: 14px;
+    letter-spacing: -0.2px;
+    font-weight: 700;
+    outline: none;
+    position: absolute;
+    z-index: 111;
+    height: 190px;
+    background-color: rgba(143, 146, 161, 0.05);
+    line-height: 24px;
+    border: none;
+    width: 100%;
+    padding: 11px 24px;
+    border-radius: 15px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.input-box .input option{
+    font-size: 14px;
+    letter-spacing: -0.2px;
+    font-weight: 700;
+    line-height: 46px;
+}
+
+.input-box .labelline{
+    position: absolute;
+    font-size: 14px;
+    margin: 0 20px;
+    color:#8F92A1;
+}
+
+.add__container-form .textarea-box .labelline{
+    position: absolute;
+    font-size: 14px;
+    margin: 13px 20px;
+    color:#8F92A1;
+}
+
+.select-labelline{
+    position: absolute;
+    font-size: 13px;
+    margin: -11px 8px;
+    color:#0052CC;;
+    padding: 0 10px;
+    line-height: 20px;
+    background-color: white;
+}
+
+.input-box .input:focus, .textarea-box .textarea:focus{
+    background-color: white;
+    border: 1px solid #808080;
+}
+
+.input-box .input:valid, .textarea-box .textarea:valid{
+    background-color: white;
+    border: 1px solid #0052CC;
+}
+
+.input-box .input:focus + .labelline{
+    transform: translate(-15px, -11px) scale(0.88);
+    z-index: 111;
+    padding: 0 10px;
+    line-height: 20px;
+    background-color: white;
+}
+
+.textarea-box .textarea:focus + .labelline{
+    transform: translate(-15px, -23px) scale(0.88);
+    z-index: 111;
+    padding: 0 10px;
+    line-height: 20px;
+    background-color: white;
+}
+
+.input-box .input:valid + .labelline{
+    transform: translate(-15px, -11px) scale(0.88);
+    z-index: 111;
+    padding: 0 10px;
+    line-height: 20px;
+    background-color: white;
+    color: #0052CC;
+}
+
+.textarea-box .textarea:valid + .labelline{
+    transform: translate(-15px, -23px) scale(0.88);
+    z-index: 111;
+    padding: 0 10px;
+    line-height: 20px;
+    background-color: white;
+    color: #0052CC;
+}
+
+.input-box-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 23px;
+}
+
+.add__container-buttons{
+    display: flex;
+    justify-content: end;
+}
+
+.add__container-buttons .further__button{
+    background-color:#7E2DFC;
+    color: white;
+    padding: 8px 34px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+}
+
+.add__container-buttons .cancel__button{
+    background-color:rgba(143, 146, 161, 0.1);
+    color: black;
+    padding: 8px 34px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    font-family: 'Roboto', sans-serif;
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.cssl{
+    background-color: red;
+    border-radius: 20px;
+}

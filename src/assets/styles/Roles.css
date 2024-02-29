@@ -1,0 +1,62 @@
+.role__section-list{
+    margin-top: 30px;
+}
+
+.role__section-item{
+    background-color: white;
+    border-radius: 15px;
+    padding: 16px;
+    position: relative;
+    margin-bottom: 18px;
+    width: 50%;
+}
+
+.role__section-item .delete__icon{
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+}
+
+.role__section-item .role__section-user{
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: -0.4px;
+}
+
+.role__section-item .role__name{
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: -0.4px;
+    display: flex;
+    gap: 5px;
+}
+
+.role__action-list{
+    margin-top: 6px;
+}
+
+.role__action-list .role__action{
+    display: flex;
+    margin-top: 10px;
+}
+
+.role__action .action__title{
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.role__action img{
+
+}
+
+.role__action .action{
+    color: #9CA3AF;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+}

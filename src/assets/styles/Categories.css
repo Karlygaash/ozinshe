@@ -1,0 +1,57 @@
+
+.categories__section{
+    padding: 40px 48px;
+    font-family: 'Roboto' , sans-serif;
+    background-color:rgba(143, 146, 161, 0.05);
+	border-radius: 30px 0 0;
+    height: 100vh;
+}
+
+
+.categories__list{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 18px;
+    margin-top: 30px;
+}
+
+.category__item{
+    background-color: white;
+    padding: 16px;
+    border-radius: 20px;
+    height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.category__item h3{
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+.category__footer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.category__movie-count{
+    color: #9CA3AF;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.category__footer-icons img{
+    margin-left: 16px;
+}
+
+.p-component{
+    height: auto;
+}
