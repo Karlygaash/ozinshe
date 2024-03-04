@@ -1,16 +1,17 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from 'axios'
 import PlusIcon from '../assets/icons/plusIcon.svg'
 import EditIcon from '../assets/icons/editIcon.svg'
 import DeleteIcon from '../assets/icons/deleteIcon.svg'
 import '../assets/styles/MainProjects.css'
 import { ConfirmDialog } from 'primereact/confirmdialog';
-import { confirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/themes/md-light-indigo/theme.css'
 import { Dialog } from 'primereact/dialog';
 import UploadIcon from '../assets/icons/UploadIcon.svg'
 import DefaultPoster from '../assets/icons/default__poster.png'
+import { toast } from "react-toastify"
+import { getMainProjectsService, handleDeleteMainProjectService,
+    CreateUploadFileService, getMoviesService, postCreateMainMoviesService,
+    putEditMainProjectService} from "../service";
 
 const MainProjects = () => {
     const [projects, setProjects] = useState([])
@@ -70,137 +71,52 @@ const MainProjects = () => {
     };
 
     const getMainProjects = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get("http://api.ozinshe.com/core/V1/movies_main", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setProjects(result.data)
-                console.log(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getMainProjectsService().then(result => {
+            setProjects(result)
+        })
     }
     
-    
     const CreateUploadFile = () => {
-        const token = localStorage.getItem("ozinshe_token")
         const formDate = new FormData()
         formDate.append("file", image_src)
-        axios
-            .post("http://api.ozinshe.com/core/V1/files/upload", formDate, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setFileId(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+
+        CreateUploadFileService(formDate).then(result => setFileId(result.id))
     }
 
     const CreateUploadFileEdit = () => {
-        const token = localStorage.getItem("ozinshe_token")
         const formDate = new FormData()
         formDate.append("file", image_src)
-        axios
-            .post("http://api.ozinshe.com/core/V1/files/upload", formDate, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setFileIdEditNew(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+
+        CreateUploadFileService(formDate).then(result => setFileIdEditNew(result.id))
     }
 
     const handleDeleteMainProject = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .delete(`http://api.ozinshe.com/core/V1/movies_main/${idDelete}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setIsTrue(false)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        handleDeleteMainProjectService(idDelete).then(result => {
+            setIsTrue(false)
+            toast.success("Успешно удален!");
+        })
     }
 
     const getMovies = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/movies`, 
-            {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setMovies(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getMoviesService().then(result => setMovies(result))
     }
 
     const postCreateMainMovies = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .post("http://api.ozinshe.com/core/V1/movies_main", {
-                fileId,
-                movieId,
-                sortOrder
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setFileId(0)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        postCreateMainMoviesService(fileId, movieId, sortOrder).then(result => {
+            console.log(result)
+            setIsTrue(false)
+            setFileId(0)
+            toast.success("Успешно создался");  
+        })
     }
 
     const putEditMainProject = (file_id) => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .put(`http://api.ozinshe.com/core/V1/movies_main/${idEdit}`, {
-                "fileId" : file_id,
-                "movieId" : movieidEdit,
-                "sortOrder" : sortOrderEdit,              
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setFileIdEditNew(0)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        putEditMainProjectService(idEdit, file_id, movieidEdit,sortOrderEdit).then(result=>{
+            console.log(result)
+            setIsTrue(false)
+            setFileIdEditNew(0)
+            toast.success("Успешно изменились"); 
+        })
     }
 
     const handleDeleteImage = () => {
@@ -290,7 +206,7 @@ const MainProjects = () => {
                         {drag ? 
                         <div className="upload__block">
                             <img src={UploadIcon} alt=""/>
-                            <p>Перетащите картинку или загрузите</p>
+                            <p>Перетащите картинку или <span style={{color: '#0052CC'}}> загрузите </span></p>
                             <input
                                 className="file__input" 
                                 type="file"
@@ -345,7 +261,7 @@ const MainProjects = () => {
                         :
                         <div className="upload__block">
                             <img src={UploadIcon} alt=""/>
-                            <p>Перетащите картинку или загрузите</p>
+                            <p>Перетащите картинку или <span style={{color: '#0052CC'}}> загрузите </span></p>
                             <input
                                 className="file__input" 
                                 type="file"
@@ -387,7 +303,7 @@ const MainProjects = () => {
                 <ConfirmDialog visible={visibleDelete} 
                     onHide={() => setVisibleDelete(false)} 
                     message="Вы действительно хотите удалить из главной?"
-                    header="Удалить проек из главной?" 
+                    header="Удалить проект из главной?" 
                     reject={()=>setVisibleDelete(false)} 
                     accept={() => handleDeleteMainProject()}
                     rejectLabel="Отмена"

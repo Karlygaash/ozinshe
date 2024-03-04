@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from 'axios'
 import PlusIcon from '../assets/icons/plusIcon.svg'
 import DownIcon from '../assets/icons/DownIcon.svg'
 import ClockIcon from '../assets/icons/clockIcon.svg'
@@ -8,6 +7,8 @@ import EditIcon from '../assets/icons/editIcon.svg'
 import DeleteIcon from '../assets/icons/deleteIcon.svg'
 import { Link } from "react-router-dom";
 import '../assets/styles/Projects.css'
+import LogoDefault from '../assets/icons/logoDefault.svg'
+import { fetchCategories, getYearsControllerService, fetchMoviesService } from "../service";
 
 const Projects = () => {
     const [projects, setProjects] = useState([])
@@ -19,52 +20,15 @@ const Projects = () => {
     const [sortField, setSortField] = useState("")
   
     const getMovies = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/movies/page?year=${year}&categoryId=${categoryId}&type=${type}&sortField=${sortField}`, 
-            {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setProjects(result.data.content)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchMoviesService(year, categoryId, type, sortField).then(result => setProjects(result.content))
     }
 
     const getCategories = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get("http://api.ozinshe.com/core/V1/categories", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setCategories(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchCategories().then(result=>setCategories(result))
     }
 
     const getYearsController = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get("http://api.ozinshe.com/core/V1/year/list", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setYearList(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getYearsControllerService().then(result=>setYearList(result))
     }
 
     useEffect(()=>{
@@ -72,6 +36,7 @@ const Projects = () => {
         getCategories()
         getYearsController()
     }, [year, categoryId, type, sortField])
+
     return(
         <div className="section">
             <div className="section__header">
@@ -128,7 +93,11 @@ const Projects = () => {
             <div className="section__project-list">
                 {projects.map(element =>(
                     <div key={element.id} className="section__project-item">
-                        <Link to={`/projects/${element.id}`}><img src={element.poster.link} className="project__poster-image"/></Link>
+                        <Link to={`/projects/${element.id}`}>
+                            {element.poster === null ? <img src={LogoDefault} alt="" className="project__poster-image"/> :
+                            <img src={element.poster.link} className="project__poster-image"/>
+                            }
+                        </Link>
                         <Link to={`/projects/${element.id}`}><h4 className="project__title">
                             {element.name.slice(0, 22)}
                             {element.name.length >22 ? '...' : ''}
@@ -153,7 +122,7 @@ const Projects = () => {
                                 {element.watchCount}
                             </div>
                             <div className="project__buttons">
-                                <img className="project__button" src={EditIcon} alt=""/>
+                                <Link to={`/projects/${element.id}/edit`}><img className="project__button" src={EditIcon} alt=""/></Link>
                                 <img className="project__button" src={DeleteIcon} alt=""/>
                             </div>
                         </div>

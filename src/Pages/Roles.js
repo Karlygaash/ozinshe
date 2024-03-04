@@ -10,6 +10,8 @@ import { confirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/themes/md-light-indigo/theme.css'
 import { Dialog } from 'primereact/dialog';
 import '../assets/styles/ProjectAdd.css'
+import { toast } from "react-toastify"
+import { getRolesService, postCreateRoleService, deleteRolesByIdService} from "../service";
 
 const Roles = () => {
     const [visible, setVisible] = useState()
@@ -22,61 +24,22 @@ const Roles = () => {
     const [roleDelete, setRoleDelete] = useState("")
     
     const getRoles = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get("http://api.ozinshe.com/core/V1/admin/?hasMoreRoles=true&size=20", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setAdminRoles(result.data.content)
-                console.log(result.data.content)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getRolesService().then(result => setAdminRoles(result.content))
     }
 
     const postCreateRole = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .put("http://api.ozinshe.com/core/V1/admin/roles", {
-                email,
-                "role" : roleToAdd
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(true)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+
+        postCreateRoleService(email,roleToAdd).then(result => {
+            setIsTrue(true)
+            toast.success("Успешно создался"); 
+        })
     }
 
     const deleteRolesById = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .delete(`http://api.ozinshe.com/core/V1/admin/${idDelete}`, {
-                "id": idDelete,
-                "name": roleDelete,
-            },{
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result)
-                setIsTrue(false)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        deleteRolesByIdService(idDelete, roleDelete).then(result => {
+            setIsTrue(false)
+            toast.success("Успешно удалились"); 
+        })
     }
 
     const handleCancelButton = () => {

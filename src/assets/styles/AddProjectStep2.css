@@ -1,0 +1,57 @@
+.footer__buttons{
+    display: flex;
+    justify-content: space-between;
+}
+
+.add__container-step2{
+    margin-top: 32px;
+}
+
+.add__container-step2 .step2__addSeason{
+    background-color:#7E2DFC;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+}
+
+.add__container-step2 .step2__series{
+    margin: 20px 0;
+}
+
+.add__container-step2 .step2__series h2{
+    margin-bottom: 15px;
+}
+
+.add__container-step2 .step2__series p{
+    color: #0052CC;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 500;
+    line-height: -0.2px;
+    cursor: pointer;
+}
+
+.step2__input{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.step2__input img{
+    margin-left: 20px;
+}
+
+.youTube-passive{
+    display: none;
+}
+
+.youTube{
+    margin-bottom: 20px;
+}

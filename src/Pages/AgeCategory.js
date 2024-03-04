@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from 'axios'
 import PlusIcon from '../assets/icons/plusIcon.svg'
@@ -6,12 +5,14 @@ import CameraIcon from '../assets/icons/CameraIcon.svg'
 import EditIcon from '../assets/icons/edit.svg'
 import DeleteIcon from '../assets/icons/delete.svg'
 import { ConfirmDialog } from 'primereact/confirmdialog';
-import { confirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/themes/md-light-indigo/theme.css'
 import { Dialog } from 'primereact/dialog';
 import '../assets/styles/Jenres.css'
 import DefaultPoster from '../assets/icons/default__poster.png'
 import UploadIcon from '../assets/icons/UploadIcon.svg'
+import { toast } from "react-toastify"
+import { CreateUploadFileService, getAgeCategoryByIdService, postCreateAgeCategoryService,
+    getAgeCategoryService, putEditAgeCategoryService, handleDeleteAgeCategoryService } from "../service";
 
 const AgeCategory = () => {
     const [ageCategory, setAgeCategory] = useState([])
@@ -61,137 +62,51 @@ const AgeCategory = () => {
     };
 
     const CreateUploadFile = () => {
-        const token = localStorage.getItem("ozinshe_token")
         const formDate = new FormData()
         formDate.append("file", image_src)
-        axios
-            .post("http://api.ozinshe.com/core/V1/files/upload", formDate, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setFileId(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        CreateUploadFileService(formDate).then(result => setFileId(result.id))
     }
 
     const CreateUploadFileEdit = () => {
-        const token = localStorage.getItem("ozinshe_token")
         const formDate = new FormData()
-        formDate.append("file", image_src)
-        axios
-            .post("http://api.ozinshe.com/core/V1/files/upload", formDate, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setFileIdEditNew(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        formDate.append("file", image_src)    
+        CreateUploadFileService(formDate).then(result => setFileIdEditNew(result.id))
     }
 
     const getAgeCategoryById = (id) => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/category-ages/${id}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setNameCatAgeEdit(result.data.name)
-                setFileIdEdit(result.data.fileId)
-                setLinkEdit(result.data.link)
-                setIdEdit(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getAgeCategoryByIdService(id).then(result => {
+            setNameCatAgeEdit(result.name)
+            setFileIdEdit(result.fileId)
+            setLinkEdit(result.link)
+            setIdEdit(result.id)
+        })
     }
 
     const postCreateAgeCategory = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .post("http://api.ozinshe.com/core/V1/category-ages", {
-                fileId,
-                "name" : nameCatAge
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setFileId(0)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        postCreateAgeCategoryService(fileId, nameCatAge).then(result =>{
+            setIsTrue(false)
+            setFileId(0)
+            toast.success("Успешно создался");
+        })
     }
 
     const getAgeCategory = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get("http://api.ozinshe.com/core/V1/category-ages", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setAgeCategory(result.data)
-                console.log(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getAgeCategoryService().then(result => setAgeCategory(result))
     }
 
     const putEditAgeCategory = (file_id) => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .put(`http://api.ozinshe.com/core/V1/category-ages/${idEdit}`, {
-                "fileId" : file_id,
-                "name" : nameCatAgeEdit
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setFileIdEditNew(0)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        putEditAgeCategoryService(idEdit, file_id, nameCatAgeEdit).then(result=>{
+            setIsTrue(false)
+            setFileIdEditNew(0)
+            toast.success("Успешно изменился");
+        })
     }
 
     const handleDeleteAgeCategory = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .delete(`http://api.ozinshe.com/core/V1/category-ages/${idDelete}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setIsTrue(false)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        handleDeleteAgeCategoryService(idDelete).then(result => {
+            setIsTrue(false)
+            toast.success("Успешно удалились");
+        })
     }
 
     const handleDeleteImage = () => {
@@ -264,7 +179,7 @@ const AgeCategory = () => {
                         {drag ? 
                         <div className="upload__block">
                             <img src={UploadIcon} alt=""/>
-                            <p>Перетащите картинку или загрузите</p>
+                            <p>Перетащите картинку или <span style={{color: '#0052CC'}}>загрузите </span></p>
                             <input
                                 className="file__input" 
                                 type="file"
@@ -308,7 +223,7 @@ const AgeCategory = () => {
                         :
                         <div className="upload__block">
                             <img src={UploadIcon} alt=""/>
-                            <p>Перетащите картинку или загрузите</p>
+                            <p>Перетащите картинку или <span style={{color: '#0052CC'}}> загрузите </span></p>
                             <input
                                 className="file__input" 
                                 type="file"

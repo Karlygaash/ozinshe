@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from 'axios'
 import PlusIcon from '../assets/icons/plusIcon.svg'
@@ -6,12 +5,14 @@ import CameraIcon from '../assets/icons/CameraIcon.svg'
 import EditIcon from '../assets/icons/edit.svg'
 import DeleteIcon from '../assets/icons/delete.svg'
 import { ConfirmDialog } from 'primereact/confirmdialog';
-import { confirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/themes/md-light-indigo/theme.css'
 import { Dialog } from 'primereact/dialog';
 import '../assets/styles/Jenres.css'
 import UploadIcon from '../assets/icons/UploadIcon.svg'
 import DefaultPoster from '../assets/icons/default__poster.png'
+import { toast } from "react-toastify"
+import { fetchJenres, fetchJenreById, CreateUploadFileService, 
+    putEditJenreService, postCreateJenreService, HandleDeleteJenreService } from "../service";
 
 const Jenres = () => {
     const [visible, setVisible] = useState()
@@ -61,92 +62,62 @@ const Jenres = () => {
       };
 
     const getJenres = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get("http://api.ozinshe.com/core/V1/genres", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setJenres(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchJenres().then(result=>{
+            setJenres(result)
+        })
     }
 
     const getJenreById = (id) => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/genres/${id}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setNameJenreEdit(result.data.name)
-                setFileIdEdit(result.data.fileId)
-                setLinkEdit(result.data.link)
-                setIdEdit(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchJenreById(id).then(result => {
+            console.log(result)
+            setNameJenreEdit(result.name)
+            setFileIdEdit(result.fileId)
+            setLinkEdit(result.link)
+            setIdEdit(result.id)
+        })
     }
 
     const CreateUploadFile = () => {
-        const token = localStorage.getItem("ozinshe_token")
         const formDate = new FormData()
         formDate.append("file", image_src)
-        axios
-            .post("http://api.ozinshe.com/core/V1/files/upload", formDate, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setFileId(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+
+        CreateUploadFileService(formDate).then(result=>{
+            setFileId(result.id)
+        })
     }
 
     const CreateUploadFileEdit = () => {
-        const token = localStorage.getItem("ozinshe_token")
         const formDate = new FormData()
         formDate.append("file", image_src)
-        axios
-            .post("http://api.ozinshe.com/core/V1/files/upload", formDate, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setFileIdEditNew(result.data.id)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+
+        CreateUploadFileService(formDate).then(result=>{
+            setFileIdEditNew(result.id)
+        })
+    }
+
+    const putEditJenre = (file_id) => {
+        putEditJenreService(idEdit, file_id, nameJenreEdit).then(result => {
+            console.log(result)
+            setIsTrue(false)
+            setFileIdEditNew(0)
+            toast.success("Успешно изменились");  
+        })
+    }
+
+    const postCreateJenre = () => {
+        postCreateJenreService(fileId, nameJenr).then(result => {
+            console.log(result)
+            setIsTrue(false)
+            setFileId(0)
+            toast.success("Успешно создался"); 
+        })
     }
 
     const HandleDeleteJenre = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .delete(`http://api.ozinshe.com/core/V1/genres/${idDelete}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setIsTrue(false)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        HandleDeleteJenreService(idDelete).then(result => {
+            setIsTrue(false)
+            toast.success("Успешно удалились"); 
+        })
     }
 
     const deleteJenres = (id) => {
@@ -164,50 +135,6 @@ const Jenres = () => {
         setImage_src()
         setDrag(false)
         setLinkEdit()
-    }
-
-    const postCreateJenre = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .post("http://api.ozinshe.com/core/V1/genres", {
-                fileId,
-                "name" : nameJenr
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setFileId(0)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }
-
-    const putEditJenre = (file_id) => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .put(`http://api.ozinshe.com/core/V1/genres/${idEdit}`, {
-                "fileId" : file_id,
-                "name" : nameJenreEdit
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setFileIdEditNew(0)
-            })
-            .catch(error => {
-                console.log(error)
-            })
     }
 
     const handleCancelButton = () => {
@@ -263,7 +190,7 @@ const Jenres = () => {
                         {drag ? 
                         <div className="upload__block">
                             <img src={UploadIcon} alt=""/>
-                            <p>Перетащите картинку или загрузите</p>
+                            <p>Перетащите картинку или <span style={{color: '#0052CC'}}>загрузите </span></p>
                             <input
                                 className="file__input" 
                                 type="file"
@@ -307,7 +234,7 @@ const Jenres = () => {
                         :
                         <div className="upload__block">
                             <img src={UploadIcon} alt=""/>
-                            <p>Перетащите картинку или загрузите</p>
+                            <p>Перетащите картинку или <span style={{color: '#0052CC'}}>загрузите</span></p>
                             <input
                                 className="file__input" 
                                 type="file"

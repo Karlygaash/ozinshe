@@ -6,6 +6,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import EyeIcon from '../assets/icons/EyeIcon.svg'
 import EditIcon from '../assets/icons/editIcon.svg'
 import DeleteIcon from '../assets/icons/deleteIcon.svg'
+import { getInformationSearchedService } from '../service';
 
 const SearchItem = () => {
     const {searchWord} = useParams()
@@ -13,20 +14,7 @@ const SearchItem = () => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     const getInformationSearched = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/movies/search?search=${searchWord}`, 
-            {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setSearchItem(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getInformationSearchedService(searchWord).then(result => setSearchItem(result))
     }
 
     useEffect(()=>{

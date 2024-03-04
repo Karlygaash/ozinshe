@@ -4,6 +4,7 @@ import axios from 'axios'
 import '../assets/styles/Users.css'
 import { Dialog } from 'primereact/dialog';
 import UserIcon from '../assets/icons/user__icon.svg'
+import { getUsersService } from "../service";
 
 const Users = () => {
     const [sortField, setSortField] = useState("name")
@@ -14,20 +15,11 @@ const Users = () => {
     const [birthDate, setBirthDate] = useState("") 
 
     const getUsers = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/admin/?size=20&direction="ASC"&sortField=${sortField}`, 
-            {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setUsers(result.data.content)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        if(sortField==="name"){
+            getUsersService(sortField, "ASC").then(result=>setUsers(result.content))
+        }else if(sortField==="createdDate"){
+            getUsersService(sortField, "DESC").then(result=>setUsers(result.content))
+        }
     }
 
     const handleShowDialog = (name, email, birthDate) => {

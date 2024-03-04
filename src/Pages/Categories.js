@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from 'axios'
 import PlusIcon from '../assets/icons/plusIcon.svg'
@@ -7,9 +6,10 @@ import EditIcon from '../assets/icons/edit.svg'
 import DeleteIcon from '../assets/icons/delete.svg'
 import '../assets/styles/Categories.css'
 import { ConfirmDialog } from 'primereact/confirmdialog';
-import { confirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/themes/md-light-indigo/theme.css'
 import { Dialog } from 'primereact/dialog';
+import { toast } from "react-toastify"
+import { fetchCategories, postAddCategory, putCategory, deleteCategoryById } from "../service";
 
 const Categories = () => {
     const [categories, setCategories] = useState([])
@@ -23,79 +23,33 @@ const Categories = () => {
     const [idDelete, setIdDelete] = useState()
 
     const getCategories = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get('http://api.ozinshe.com/core/V1/categories', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setCategories(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchCategories().then(result => setCategories(result))
     }
 
     const postCreateCategory = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .post("http://api.ozinshe.com/core/V1/categories", {
-                "name" : nameToAdd
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setVisible(false)
-                setNameToAdd("")    
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        postAddCategory(nameToAdd).then(result => {
+            setIsTrue(false)
+            setVisible(false)
+            setNameToAdd("") 
+            toast.success("Успешно создался");
+            console.log(result) 
+        })
     }
 
     const putEditCategory = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .put(`http://api.ozinshe.com/core/V1/categories/${idEdit}`, {
-                "name" : nameEdit
-            }, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setIsTrue(false)
-                setVisibleEdit(false)  
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        putCategory(idEdit,nameEdit).then(result =>{
+            console.log(result)
+            setIsTrue(false)
+            setVisibleEdit(false) 
+            toast.success("Успешно изменились");
+        })
     }
 
     const handleDeleteCategory = () => {
-        const token = localStorage.getItem("ozinshe_token")
-
-        axios
-            .delete(`http://api.ozinshe.com/core/V1/categories/${idDelete}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setIsTrue(false)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        deleteCategoryById(idDelete).then(result => {
+            setIsTrue(false)
+            toast.success("Успешно удалились"); 
+        })
     }
 
     const deleteCategory = (id) => {

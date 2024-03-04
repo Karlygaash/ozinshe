@@ -1,57 +1,66 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import RightIcon from '../assets/icons/rightIcon.svg'
 import '../assets/styles/ProjectAdd.css'
 import Button from '../assets/icons/Button.svg'
 import { useEffect, useState } from 'react';
+import { MultiSelect } from 'primereact/multiselect';
+import { fetchCategories, fetchJenres, getAgeCategoryService } from '../service';
 import axios from 'axios'
 
 const ProjectsAdd = () => {
     const [jenres, setJenres] = useState([])
     const [categories, setCategories] = useState([])
     const [categoryAges, setCategoryAges] = useState([])
+    const [selectedCategories, setSelectedCategories] = useState(null);
+    const [selectedJenres, setSelectedJenres] = useState(null)
+    const [selectedCategoryAges, setSelectedCategoryAges] = useState(null)
+    const navigate = useNavigate()
+
+    const [name, setName] = useState("")
+    const [description, setDescription] = useState("")
+    const [keyWords, setKeyWords] = useState("")
+    const [movieType, setMovieType] = useState("")
+    const [year, setYear] = useState()
+    const [timing, setTiming] = useState()
+    const [director, setDirector] = useState("")
+    const [producer, setProducer] = useState("")
+    const [idMovie, setIdMovie] = useState()
 
     const getJenres = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get('http://api.ozinshe.com/core/V1/genres', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setJenres(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchJenres().then(result => setJenres(result))
     }
 
     const getCategories = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get('http://api.ozinshe.com/core/V1/categories', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setCategories(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchCategories().then(result => setCategories(result))
     }
 
     const getCategorуAges = () => {
+        getAgeCategoryService().then(result => setCategoryAges(result))
+    }
+
+    const postCreateMovie = () => {
         const token = localStorage.getItem("ozinshe_token")
         axios
-            .get('http://api.ozinshe.com/core/V1/category-ages', {
+            .post("http://api.ozinshe.com/core/V1/movies", {
+                name,
+                keyWords,
+                movieType,
+                timing,
+                year,
+                producer,
+                director,
+                description,
+                "genres" : selectedJenres,
+                "categories" : selectedCategories,
+                "categoryAges" : selectedCategoryAges
+            }, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			})
             .then(result => {
-                setCategoryAges(result.data)
+                console.log(result)
+                setIdMovie(result.data.id)
             })
             .catch(error => {
                 console.log(error)
@@ -73,80 +82,70 @@ const ProjectsAdd = () => {
             <div className='add__container'>
                 <div className='add__container-title'>
                     <Link to="/projects"><img src={Button} alt=""/></Link>
-                    <h2>Оснавная информация</h2>
+                    <h2>Основная информация</h2>
                 </div>
                 <div className='add__container-form'>
                     <div className='input-box'>
-                        <input className='input' type="text" required/>
+                        <input value={name} onChange={e=>setName(e.target.value)} className='input' type="text" required/>
                         <div className='labelline'> Название проекта</div>
                     </div>
-                    <div className='input-box'>
-                        <select className='input' required>
-                            <option></option>
-                            {categories.map(element=>(
-                               <option value={element.id}>{element.name}</option>
-                            ))}
-                        </select>
+                    <div className='input__box'>
+                        <MultiSelect value={selectedCategories} onChange={(e) => setSelectedCategories(e.value)} options={categories} optionLabel="name" 
+                            maxSelectedLabels={4} className="input" />
                         <div className='labelline'>Категория</div>
                     </div>
-                    <div className='input-box'>
-                        <select className='input' required>
-                            <option></option>
-                            {jenres.map(element=>(
-                               <option value={element.id}>{element.name}</option>
-                            ))}
-                        </select>
+
+                    <div className='input__box'>
+                        <MultiSelect value={selectedJenres} onChange={(e) => setSelectedJenres(e.value)} options={jenres} optionLabel="name" 
+                            maxSelectedLabels={4} className="input" />
                         <div className='labelline'>Жанры</div>
                     </div>
+                   
                     <div className='input-box-grid'>
                         <div className='input-box'>
-                            <select className='input' required>
+                            <select onChange={e=> setMovieType(e.target.value)} className='input' required>
                                 <option></option>
-                                <option>Сериал</option>
-                                <option>Фильм</option>
+                                <option value="SERIAL">Сериал</option>
+                                <option value="MOVIE">Фильм</option>
                             </select>
                             <div className='labelline'>Тип проекта</div>
                         </div>
-                        <div className='input-box'>
-                            <select className='input' required>
-                                <option></option>
-                                {categoryAges.map(element=>(
-                                    <option value={element.id}>{element.name}</option>
-                                ))}
-                            </select>
+                        <div className='input__box'>
+                            <MultiSelect value={selectedCategoryAges} onChange={(e) => setSelectedCategoryAges(e.value)} options={categoryAges} optionLabel="name" 
+                                maxSelectedLabels={4} className="input" />
                             <div className='labelline'>Возрастная категория</div>
                         </div>
                         <div className='input-box'>
-                            <input className='input' type="number" required/>
+                            <input value={year} onChange={e=>setYear(e.target.valueAsNumber)} className='input' type="number" required/>
                             <div className='labelline'>Год</div>
                         </div>
                         <div className='input-box'>
-                            <input className='input' type="number" required/>
+                            <input value={timing} onChange={e=> setTiming(e.target.valueAsNumber)} className='input' type="number" required/>
                             <div className='labelline'>Хронометраж (мин)</div>
                         </div>
                     </div>
                     <div className='input-box'>
-                        <input className='input' type="number" required/>
+                        <input value={keyWords} onChange={e=> setKeyWords(e.target.value)} className='input' type="text" required/>
                         <div className='labelline'>Ключевые слова</div>
                     </div>
                     <div className='textarea-box'>
-                        <textarea className='textarea' required/>
+                        <textarea value={description} onChange={e=> setDescription(e.target.value)} className='textarea' required/>
                         <div className='labelline'>Описание</div>
                     </div>
                     <div className='input-box'>
-                        <input className='input' type="text" required/>
+                        <input value={director} onChange={e=> setDirector(e.target.value)} className='input' type="text" required/>
                         <div className='labelline'>Режиссер</div>
                     </div>
                     <div className='input-box'>
-                        <input className='input' type="text" required/>
+                        <input value={producer} onChange={e=>setProducer(e.target.value)} className='input' type="text" required/>
                         <div className='labelline'>Продюсер</div>
                     </div>
                 </div>
                 <div className='add__container-buttons'>
-                    <button className='further__button'>Далее</button>
+                    <button onClick={()=>postCreateMovie()} className='further__button'>Далее</button>
                     <Link to="/projects"><button className='cancel__button'>Отмена</button></Link>
                 </div>
-
+                {idMovie > 0 ? navigate(`/projects/add/${idMovie}/step2`) : ""}
             </div>
         </div>
     );

@@ -16,14 +16,15 @@ import Time from 'react-time-format';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { confirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/themes/md-light-indigo/theme.css'
+import { getProjectByIdService, getVideoService } from "../service";
+import LogoDefault from '../assets/icons/logoDefault.svg'
 
 const ProjectDetail = () => {
     const {projectId} = useParams()
     const [nameProject, setNameProject] = useState("")
     const [watchCount, setWatchCount] = useState()
     const [video, setVideo] =useState([])
-    const [seasonNumber, setSeasonNumber] = useState()
-    const [youtubeLink, setYoutubeLink]= useState("https://www.youtube.com/watch?v=XfL5HLtz8b8")
+    const [seasonNumber, setSeasonNumber] = useState(1)
     const [activeSerial, setActiveSerial] = useState(1)
     const [description, setDescription] = useState("")
     const [producer, setProducer] = useState("")
@@ -33,40 +34,35 @@ const ProjectDetail = () => {
     const [categories, setCategories] = useState([])
     const [timing, setTiming] = useState()
     const [seriesCount, setSeriesCount] = useState()
-    const [image, setImage] = useState()
+    const [image, setImage] = useState("")
     const [createdDate, setCreatedDate] = useState()
     const [lastModifiedDate, setLastModifiedDate] = useState()
+    const [youtubeLink, setYoutubeLink]= useState()
  
     const getProjectById = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/movies/${projectId}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setNameProject(result.data.name)
-                setWatchCount(result.data.watchCount)
-                setDescription(result.data.description)
-                setProducer(result.data.producer)
-                setDirector(result.data.director)
-                setScreenshots(result.data.screenshots)
-                setYear(result.data.year)
-                setCategories(result.data.categories)
-                setTiming(result.data.timing)
-                setSeriesCount(result.data.seriesCount)
-                setImage(result.data.poster.link)
-                setCreatedDate(result.data.createdDate)
-                setLastModifiedDate(result.data.lastModifiedDate)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getProjectByIdService(projectId).then(result =>{
+            if(result.seriesCount === 0 && result.video !=  null){
+                setYoutubeLink("https://www.youtube.com/watch?v=" + result.video.link)
+            }
+            setNameProject(result.name)
+            setWatchCount(result.watchCount)
+            setDescription(result.description)
+            setProducer(result.producer)
+            setDirector(result.director)
+            setScreenshots(result.screenshots)
+            setYear(result.year)
+            setCategories(result.categories)
+            setTiming(result.timing)
+            setSeriesCount(result.seriesCount)
+            if(result.poster !=null){
+                setImage(result.poster.link)
+            }
+            setCreatedDate(result.createdDate)
+            setLastModifiedDate(result.lastModifiedDate)
+        })
     }
 
     const getVideo = () => {
-
         const token = localStorage.getItem("ozinshe_token")
         axios
             .get(`http://api.ozinshe.com/core/V1/seasons/${projectId}`, {
@@ -76,8 +72,12 @@ const ProjectDetail = () => {
 			})
             .then(result => {
                 // console.log(result.data)
-                setVideo(result.data[0].videos)
-                setSeasonNumber(result.data[0].number)
+                if(result.data[0].number > 0){
+                    setVideo(result.data[0].videos)
+                    setSeasonNumber(result.data[0].number)
+                    setYoutubeLink("https://www.youtube.com/watch?v=" + result.data[0].videos[0].link)
+                }
+                
             })
             .catch(error => {
                 console.log(error)
@@ -135,13 +135,15 @@ const ProjectDetail = () => {
 
                 <div>
                     <Youtube youtubeLink={youtubeLink}/>
-                    <button className="project__season-number">{seasonNumber} сезон</button>
+                    {seriesCount === 0 ? "" : <button className="project__season-number">{seasonNumber} сезон</button> }
                     <div className="project__serial-numbers">
-                        {video.map(element => (
+                    {seriesCount === 0 ? "" : 
+                        video.map(element => (
                             <div key={element.id} className={element.number === activeSerial ? "project__serial-number-active" : "project__serial-number"}>
                                 <p onClick={e => handleClickedSerial(element.link, element.number)}>{element.number} серия</p>
                             </div>
-                        ))}
+                        ))
+                        }
                     </div>
                 </div>
 
@@ -155,9 +157,11 @@ const ProjectDetail = () => {
                 <div className="project__screenshots">
                     <h2>Скриншоты</h2>
                     <div className="screenshoots__list">
-                        {screenshots.map(element =>(
+                        {screenshots === null ? "" :
+                        screenshots.map(element =>(
                             <img src={element.link}/>
-                        ))}
+                        ))
+                        }
                     </div>
                 </div>
             </div>
@@ -171,17 +175,20 @@ const ProjectDetail = () => {
                 <div className="description__flex serial-type">
                     <img src={klavishIcon} alt=""/>
                     <div>
-                        {categories.map(element =>(
+                        {categories === null ? "" :
+                        categories.map(element =>(
                             <p>{element.name}</p>
-                        ))}
+                        ))
+                        }
                     </div>
                 </div>
                 <div className="description__flex">
                     <img src={BoardIcon} alt=""/>
                     <p>{seriesCount} серии, {timing} мин</p>
                 </div>
-
+                {image === "" ? <img src={LogoDefault} alt=""/> :
                 <img src={image} alt="" className="description__image"/>
+                }
             </div>
 
             <div className="section__description-time">

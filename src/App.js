@@ -18,6 +18,8 @@ import Jenres from './Pages/Jenres';
 import Roles from './Pages/Roles';
 import Users from './Pages/Users';
 import AgeCategory from './Pages/AgeCategory';
+import ProjectAddStep2 from './Pages/ProjectAddStep2';
+import ProjectAddStep3 from './Pages/ProjectAddStep3';
 
 function App() {
   const router=createBrowserRouter([
@@ -45,6 +47,14 @@ function App() {
 			element: <ProjectsAdd/>
 		},
 		{
+			path: "/projects/add/:idMovie/step2",
+			element: <ProjectAddStep2/>
+		},
+		{
+			path: "/projects/add/:idMovie/step3",
+			element: <ProjectAddStep3/>
+		},
+		{
 			path: "/projects/:projectId/edit",
 			element: <ProjectEdit/>
 		},
@@ -53,11 +63,11 @@ function App() {
 			element: <ProjectDetail/>,
 		},
         {
-			path: "movies-main",
+			path: "/movies-main",
 			element: <MainProjects/>
 		},  
 	   {
-			path: "categories",
+			path: "/categories",
 			element: <Categories/>,
 		},
         {
@@ -65,15 +75,15 @@ function App() {
 			element: <Roles/>,
 		},
         {
-			path: "users",
+			path: "/users",
 			element: <Users/>,
 		},        
         {
-			path: "jenres",
+			path: "/jenres",
 			element: <Jenres/>,
 		},
         {
-			path: "category-ages",
+			path: "/category-ages",
 			element: <AgeCategory/>
 		},
 		{
@@ -88,12 +98,9 @@ function App() {
     <div className="App">
       <RouterProvider router={router} />
       <ToastContainer
-				position="top-right"
-				autoClose={5000}
-				hideProgressBar={false}
-				newestOnTop={false}
+				position="bottom-left"
+				autoClose={3000}
 				closeOnClick
-				pauseOnFocusLoss
 				draggable
 				pauseOnHover
 			/>

@@ -5,6 +5,7 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import LoginLogo from '../assets/icons/Your_App.svg' 
 import '../assets/styles/Login.css'
+import { handleSubmitClickedService } from "../service";
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -14,20 +15,11 @@ const Login = () => {
     const handleSubmitClicked = (e) => {
 		e.preventDefault()
 
-		axios
-			.post("http://api.ozinshe.com/auth/V1/signin", {
-				email,
-				password,
-			})
-			.then(result => {
-				const token = result.data.accessToken
-
-				localStorage.setItem("ozinshe_token", token)
-                navigate("/")
-			})
-			.catch(error => {
-				toast.error(error.response.data.error)
-			})
+        handleSubmitClickedService(email.password).then(result => {
+            const token = result.accessToken
+			localStorage.setItem("ozinshe_token", token)
+            navigate("/") 
+        })
 	}
 
     useEffect(() => {

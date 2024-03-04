@@ -5,6 +5,7 @@ import '../assets/styles/ProjectAdd.css'
 import Button from '../assets/icons/Button.svg'
 import { useEffect, useState } from 'react';
 import axios from 'axios'
+import {fetchJenres, getProjectByIdService} from '../service'
 
 
 const ProjectEdit = () => {
@@ -26,46 +27,23 @@ const ProjectEdit = () => {
 
 
     const getJenres = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get('http://api.ozinshe.com/core/V1/genres', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                setJenres(result.data)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        fetchJenres().then(result => setJenres(result))
     }
 
     const getProjectById = () => {
-        const token = localStorage.getItem("ozinshe_token")
-        axios
-            .get(`http://api.ozinshe.com/core/V1/movies/${projectId}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-            .then(result => {
-                console.log(result.data)
-                setCategory(result.data.categories)
-                setCategoryAge(result.data.categoryAge)
-                setDescription(result.data.description)
-                setDirector(result.data.director)
-                setJenr(result.data.jenres)
-                setKeyWords(result.data.keyWords)
-                setNameProject(result.data.name)
-                setProducer(result.data.producer)
-                setMovieType(result.data.movieType)
-                setTiming(result.data.timing)
-                setYear(result.data.year)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        getProjectByIdService(projectId).then(result => {
+            setCategory(result.categories)
+            setCategoryAge(result.categoryAge)
+            setDescription(result.description)
+            setDirector(result.director)
+            setJenr(result.jenres)
+            setKeyWords(result.keyWords)
+            setNameProject(result.name)
+            setProducer(result.producer)
+            setMovieType(result.movieType)
+            setTiming(result.timing)
+            setYear(result.year)    
+        })
     }
 
     const getCategories = () => {
