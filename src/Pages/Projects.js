@@ -9,6 +9,11 @@ import { Link } from "react-router-dom";
 import '../assets/styles/Projects.css'
 import LogoDefault from '../assets/icons/logoDefault.svg'
 import { fetchCategories, getYearsControllerService, fetchMoviesService } from "../service";
+import { ConfirmDialog } from 'primereact/confirmdialog';
+import 'primereact/resources/themes/md-light-indigo/theme.css'
+import axios from 'axios'
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css";
 
 const Projects = () => {
     const [projects, setProjects] = useState([])
@@ -18,6 +23,9 @@ const Projects = () => {
     const [categoryId, setCategoryId] = useState("")
     const [type, setType] =useState("")
     const [sortField, setSortField] = useState("")
+    const [visibleDelete, setVisibleDelete] = useState()
+    const [idDelete, setIdDelete] = useState()
+    const [isTrue, setIsTrue] = useState()
   
     const getMovies = () => {
         fetchMoviesService(year, categoryId, type, sortField).then(result => setProjects(result.content))
@@ -31,11 +39,37 @@ const Projects = () => {
         getYearsControllerService().then(result=>setYearList(result))
     }
 
+    const handleDeleteProject = (id) => {
+        setIdDelete(id)
+        setVisibleDelete(true)
+    }
+
+    const deleteProject = () => {
+        const token = localStorage.getItem("ozinshe_token")
+
+        axios 
+        .delete(`http://api.ozinshe.com/core/V1/movies/${idDelete}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then(result => {
+            console.log(result.data) 
+            setIsTrue(true)
+            toast.success("Проект успешно удалился")
+        })
+        .catch(error => {
+            console.log(error)
+            toast.error("Что-то пошло не так");
+        })
+    }
+
     useEffect(()=>{
         getMovies()
         getCategories()
         getYearsController()
-    }, [year, categoryId, type, sortField])
+        setIsTrue(false)
+    }, [year, categoryId, type, sortField, isTrue])
 
     return(
         <div className="section">
@@ -102,6 +136,7 @@ const Projects = () => {
                             {element.name.slice(0, 22)}
                             {element.name.length >22 ? '...' : ''}
                         </h4> </Link>
+                        {element.categories === null ? "" :
                         <ul>
                             <li className="">
                                 {element.categories[0].name.slice(0, 11)}
@@ -112,10 +147,9 @@ const Projects = () => {
                             <li> 
                                 {element.categories[1].name.slice(0, 11)}
                                 {element.categories[1].name.length >11 ? '...' : ''}
-                            </li> : ''}
-            
-                            
+                            </li> : ''}               
                         </ul>
+                        }
                         <div className="project__footer">
                             <div className="project__watch-count">
                                 <img src={EyeIcon} alt=""/>
@@ -123,12 +157,21 @@ const Projects = () => {
                             </div>
                             <div className="project__buttons">
                                 <Link to={`/projects/${element.id}/edit`}><img className="project__button" src={EditIcon} alt=""/></Link>
-                                <img className="project__button" src={DeleteIcon} alt=""/>
+                                <img onClick={()=>handleDeleteProject(element.id)} className="project__button" src={DeleteIcon} alt=""/>
                             </div>
                         </div>
                     </div>
                 ))}
-            </div>    
+                <ConfirmDialog visible={visibleDelete} 
+                    onHide={() => setVisibleDelete(false)} 
+                    message="Вы действительно хотите удалить проект?"
+                    header="Удалить проект?" 
+                    reject={()=>setVisibleDelete(false)} 
+                    accept={() => deleteProject()}
+                    acceptLabel="Да, удалить"
+                    rejectLabel="Отмена"
+                />
+            </div>  
         </div>
     );
 };

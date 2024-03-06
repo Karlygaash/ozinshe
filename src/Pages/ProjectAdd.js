@@ -39,6 +39,43 @@ const ProjectsAdd = () => {
     }
 
     const postCreateMovie = () => {
+        if (!name.trim()) {
+            alert("Заполните название!");
+            return;
+        }if (!keyWords.trim()) {
+            alert("Заполните ключевые слово");
+            return;
+        }if (!movieType.trim()) {
+            alert("Заполните тип проекта!");
+            return;
+        }
+        if (timing === undefined || timing === null) {
+            alert("Заполните длительность!");
+            return;
+        }
+        if (year === undefined || year === null) {
+            alert("Заполните год!");
+            return;
+        }if (!producer.trim()) {
+            alert("Заполните продюсера!");
+            return;
+        }if (!director.trim()) {
+            alert("Заполните режисера!");
+            return;
+        }if (!description.trim()) {
+            alert("Заполните описание!");
+            return;
+        }if(selectedCategories.length===0){
+            alert("Заполните категорию")
+            return;
+        }if(selectedJenres.length===0){
+            alert("Заполните жанры")
+            return;
+        }if(selectedCategoryAges.length===0){
+            alert("Заполните возрастную категорию")
+            return;
+        }
+
         const token = localStorage.getItem("ozinshe_token")
         axios
             .post("http://api.ozinshe.com/core/V1/movies", {

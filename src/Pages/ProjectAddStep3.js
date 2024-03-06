@@ -8,6 +8,9 @@ import { useEffect, useState } from "react";
 import axios from 'axios'
 import { toast } from "react-toastify"
 import UploadIcon from '../assets/icons/UploadIcon.svg'
+import Success from '../assets/icons/success.svg'
+import 'primereact/resources/themes/md-light-indigo/theme.css'
+import { Dialog } from 'primereact/dialog';
 
 const ProjectAddStep3 = () => {
     const {idMovie} = useParams();
@@ -17,6 +20,7 @@ const ProjectAddStep3 = () => {
     const [screenshots, setScreenshots] = useState([])
     const [fileIdPoster, setFileIdPoster] = useState(0)
     const [uploadFilesMulti, setUploadFilesMulti] = useState([])
+    const [visible, setVisible] = useState()
 
     const handleOnChangePoster = (event) => {
         event.preventDefault();
@@ -38,8 +42,18 @@ const ProjectAddStep3 = () => {
         const formDate = new FormData()
         const formDateArray = new FormData()
 
+        if(!posterUrl.length === 0){
+            alert("Обложка пусто")
+            return;
+        }if(screenshots.length===0){
+            alert("Скриншоты пусто")
+            return;
+        }
+
         formDate.append("file", posterUrl)
-        formDateArray.append("files", screenshots)
+        {screenshots.map(element => {
+            formDateArray.append('files', element)
+        })}
 
         axios 
         .post(`http://api.ozinshe.com/core/V1/files/upload`, formDate, {
@@ -48,7 +62,6 @@ const ProjectAddStep3 = () => {
             },
         })
         .then(result => {
-            console.log(result.data)
             setFileIdPoster(result.data.id)
         })
         .catch(error => {
@@ -63,8 +76,54 @@ const ProjectAddStep3 = () => {
             },
         })
         .then(result => {
-            console.log(result.data)
             setUploadFilesMulti(result.data)
+        })
+        .catch(error => {
+            console.log(error)
+            toast.error("Что-то пошло не так");
+        })
+    }
+
+    const handlePostImages = () => {
+        const token = localStorage.getItem("ozinshe_token")
+
+        axios 
+        .post(`http://api.ozinshe.com/core/V1/posters`, {
+            "movieId" : idMovie,
+            "fileId" : fileIdPoster
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then(result => {  
+            setVisible(true);
+            setFileIdPoster(0)
+        })
+        .catch(error => {
+            console.log(error)
+            toast.error("Что-то пошло не так");
+        })
+        setFileIdPoster(0)
+        handleCreateScreenshots()
+    }
+
+    const handleCreateScreenshots = () => {
+        const token = localStorage.getItem("ozinshe_token")
+        let array = []
+        uploadFilesMulti.map(element => {
+            array.push({"movieId" : idMovie, "fileId" : element.id})
+        })
+
+        axios 
+        .post(`http://api.ozinshe.com/core/V1/screenshots`, array, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then(result => {
+            console.log(result.data)
+            setUploadFilesMulti("")         
         })
         .catch(error => {
             console.log(error)
@@ -157,12 +216,25 @@ const ProjectAddStep3 = () => {
                     </div>
 
                     <div className="footer__buttons">
-                        <Link to="/projects"><button className='cancel__button'>Назад</button></Link>
+                        <Link to={`/projects/add/${idMovie}/step2`}><button className='cancel__button'>Назад</button></Link>
                         <div className='add__container-buttons'>
                             <button onClick={()=>handleCreateImages()} className='further__button'>Далее</button>
                             <Link to="/projects"><button className='cancel__button'>Отмена</button></Link>
                         </div>
                     </div>
+                    {fileIdPoster>0 ? handlePostImages() : ""}
+                    <Dialog header="" visible={visible} onHide={() => setVisible(false)}>
+                        <div className="dialog-container"> 
+                            <img
+                                src={Success}
+                                alt=""
+                            />
+                            <p>Проект добавлен успешно!</p>
+                            <div className="dialog-button">
+                                <Link to="/projects"><button className="confirm-dialog-accept">Закрыть</button></Link>
+                            </div>
+                        </div>
+                </Dialog>
                 </div>
             </div>
         </div>

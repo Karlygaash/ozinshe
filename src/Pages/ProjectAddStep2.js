@@ -56,6 +56,7 @@ const ProjectAddStep2 = () => {
 
     const handleCreateSeason = () => {
         const token = localStorage.getItem("ozinshe_token")
+ 
         movie.video = {
             "link" : youTubeLink
         }
@@ -71,7 +72,7 @@ const ProjectAddStep2 = () => {
             .then(result => {
                 console.log(result.data)
                 navigate(`/projects/add/${idMovie}/step3`)
-                toast.success("Успешно");
+                toast.success("Успешно создался");
             })
             .catch(error => {
                 console.log(error)
@@ -92,7 +93,7 @@ const ProjectAddStep2 = () => {
                 .then(result => {
                     console.log(result.data)
                     navigate(`/projects/add/${idMovie}/step3`)
-                    toast.success("Успешно");
+                    toast.success(`${element.seasonId} сезон успешно создался`);
                 })
                 .catch(error => {
                     console.log(error)
@@ -172,7 +173,7 @@ const ProjectAddStep2 = () => {
                     }
 
                     <div className="footer__buttons">
-                        <Link to="/projects"><button className='cancel__button'>Назад</button></Link>
+                        <Link to="/projects/add"><button className='cancel__button'>Назад</button></Link>
                         <div className='add__container-buttons'>
                             <button onClick={()=>handleCreateSeason()} className='further__button'>Далее</button>
                             <Link to="/projects"><button className='cancel__button'>Отмена</button></Link>

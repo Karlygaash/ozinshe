@@ -102,7 +102,7 @@ function App() {
 				autoClose={3000}
 				closeOnClick
 				draggable
-				pauseOnHover
+				hideProgressBar={true}
 			/>
     </div>
   );

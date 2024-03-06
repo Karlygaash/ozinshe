@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from 'axios'
 import { useEffect, useState } from "react";
 import '../assets/styles/ProjectDetail.css'
@@ -14,10 +14,10 @@ import BoardIcon from '../assets/icons/boardIcon.svg'
 import klavishIcon from '../assets/icons/klaviwIcon.svg';
 import Time from 'react-time-format';
 import { ConfirmDialog } from 'primereact/confirmdialog';
-import { confirmDialog } from 'primereact/confirmdialog';
 import 'primereact/resources/themes/md-light-indigo/theme.css'
 import { getProjectByIdService, getVideoService } from "../service";
 import LogoDefault from '../assets/icons/logoDefault.svg'
+import { toast } from "react-toastify"
 
 const ProjectDetail = () => {
     const {projectId} = useParams()
@@ -26,6 +26,7 @@ const ProjectDetail = () => {
     const [video, setVideo] =useState([])
     const [seasonNumber, setSeasonNumber] = useState(1)
     const [activeSerial, setActiveSerial] = useState(1)
+    const [activeSeason, setActiveSeason] = useState(1)
     const [description, setDescription] = useState("")
     const [producer, setProducer] = useState("")
     const [director, setDirector] = useState("")
@@ -38,6 +39,9 @@ const ProjectDetail = () => {
     const [createdDate, setCreatedDate] = useState()
     const [lastModifiedDate, setLastModifiedDate] = useState()
     const [youtubeLink, setYoutubeLink]= useState()
+    const [visibleDelete, setVisibleDelete] = useState()
+    const [seasons, setSeasons] = useState([])
+    const navigate=useNavigate()
  
     const getProjectById = () => {
         getProjectByIdService(projectId).then(result =>{
@@ -62,6 +66,26 @@ const ProjectDetail = () => {
         })
     }
 
+    const deleteProject = () => {
+        const token = localStorage.getItem("ozinshe_token")
+
+        axios 
+        .delete(`http://api.ozinshe.com/core/V1/movies/${projectId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then(result => {
+            console.log(result.data) 
+            toast.success("Проект успешно удалился");
+            navigate('/projects')
+        })
+        .catch(error => {
+            console.log(error)
+            toast.error("Что-то пошло не так");
+        })
+    }
+
     const getVideo = () => {
         const token = localStorage.getItem("ozinshe_token")
         axios
@@ -73,10 +97,12 @@ const ProjectDetail = () => {
             .then(result => {
                 // console.log(result.data)
                 if(result.data[0].number > 0){
+                    setSeasons(result.data)
                     setVideo(result.data[0].videos)
                     setSeasonNumber(result.data[0].number)
                     setYoutubeLink("https://www.youtube.com/watch?v=" + result.data[0].videos[0].link)
                 }
+                console.log(result.data)
                 
             })
             .catch(error => {
@@ -84,19 +110,13 @@ const ProjectDetail = () => {
             })
     }
 
-    const deleteProject = () => {
-        confirmDialog({
-        message: "Вы действительно хотите удалить проект?",
-        header: `Удалить "${nameProject}"?`,
-        rejectLabel: "Отмена",
-        acceptLabel: "Да, удалить"
-        // reject: () => rejectFunc()
-        })
-    }
-
     const handleClickedSerial = (link, number) => {
         setYoutubeLink("https://www.youtube.com/watch?v="+link)
         setActiveSerial(number)
+    }
+
+    const handleClickedSeason = (number) => {
+
     }
 
     useEffect(()=>{
@@ -128,14 +148,14 @@ const ProjectDetail = () => {
                     <div className="project__header-buttons">
                         <Link to={`/projects/${projectId}/edit`}><button>Редактировать</button></Link>
                         <div className="project__header-delete">
-                            <RiDeleteBinLine onClick={e=> deleteProject()} className="project__header-delete-icon"/>
+                            <RiDeleteBinLine onClick={()=>setVisibleDelete(true)} className="project__header-delete-icon"/>
                         </div>
                     </div>
                 </div>
 
                 <div>
                     <Youtube youtubeLink={youtubeLink}/>
-                    {seriesCount === 0 ? "" : <button className="project__season-number">{seasonNumber} сезон</button> }
+                    {/* {seriesCount === 0 ? "" : <button className="project__season-number">{seasonNumber} сезон</button> }
                     <div className="project__serial-numbers">
                     {seriesCount === 0 ? "" : 
                         video.map(element => (
@@ -144,7 +164,27 @@ const ProjectDetail = () => {
                             </div>
                         ))
                         }
-                    </div>
+                    </div> */}
+                    {seriesCount === 0 ? "" :
+                        seasons.map(element => (
+                            <button onClick={e => setActiveSeason(element.number)}
+                                className={element.number === activeSeason ? "project__season-number" : "project__season-number-passive"}>
+                                {element.number} сезон
+                            </button>
+                        ))
+                    }
+
+                    {seriesCount === 0 ? "" :
+                        seasons.map(element => (
+                            <div className={element.number === activeSeason ? "project__serial-numbers" : "project__serial-numbers-passive"}>
+                                {element.videos.map(index => (
+                                    <div key={index.id} className={index.number === activeSerial ? "project__serial-number-active" : "project__serial-number"}>
+                                        <p onClick={e => handleClickedSerial(index.link, index.number)}>{index.number} серия</p>
+                                    </div>                                        
+                                ))}
+                            </div>                        
+                        ))
+                    }   
                 </div>
 
                 <div className="project__description">
@@ -200,7 +240,15 @@ const ProjectDetail = () => {
                     Дата обновления: 
                     <p><Time value={lastModifiedDate} format="DD.MM.YYYY, в HH:mm" /></p>
                 </div>
-                <ConfirmDialog/>
+                <ConfirmDialog visible={visibleDelete} 
+                    onHide={() => setVisibleDelete(false)} 
+                    message="Вы действительно хотите удалить проект?"
+                    header="Удалить проект?" 
+                    reject={()=>setVisibleDelete(false)} 
+                    accept={() => deleteProject()}
+                    acceptLabel="Да, удалить"
+                    rejectLabel="Отмена"
+                />
             </div>
         </div>
     </div>
